@@ -1,0 +1,920 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assg1</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">
+import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Side;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+import javafx.scene.Group;
+import javafx.scene.canvas.Canvas;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+
+import java.util.*;
+
+
+<span class="nc" id="L26">public class App extends Application{</span>
+
+    boolean status;//indicate user or admin
+<span class="nc" id="L29">    public ArrayList&lt;String&gt; date_curs = new ArrayList&lt;&gt;();//2022-9-1,cn,us,jp,.....</span>
+<span class="nc" id="L30">    public HashMap&lt;String, ArrayList&lt;String&gt;&gt; cur_values = new HashMap&lt;&gt;();// aud,1.0,2.0,...</span>
+    public ChoiceBox cb;
+    public ChoiceBox cb2;
+<span class="nc" id="L33">    public Alert a = new Alert(null);</span>
+
+<span class="nc" id="L35">    public RateWriter rw = new RateWriter();</span>
+
+<span class="nc" id="L37">    public String alert_add = &quot;Incorrect number of inputed rate! Please make sure you inputted rates for all other currencies!&quot; +</span>
+            &quot; (Separate by space)&quot;;
+
+<span class="nc" id="L40">    double[] row0 = {0.0,0.0,0.0,0.0};</span>
+<span class="nc" id="L41">    double[] row1 = {0.0,0.0,0.0,0.0};</span>
+<span class="nc" id="L42">    double[] row2 = {0.0,0.0,0.0,0.0};</span>
+<span class="nc" id="L43">    double[] row3 = {0.0,0.0,0.0,0.0};</span>
+
+<span class="nc" id="L45">    String[] arrow0 = {&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;};</span>
+<span class="nc" id="L46">    String[] arrow1 = {&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;};</span>
+<span class="nc" id="L47">    String[] arrow2 = {&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;};</span>
+<span class="nc" id="L48">    String[] arrow3 = {&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;};</span>
+
+    @Override
+    public void start(Stage primaryStage) {
+        // First canvas
+
+        //Background image of login page
+<span class="nc" id="L55">        Image image =  new Image(&quot;file:login.jpg&quot;);</span>
+<span class="nc" id="L56">        ImageView mv = new ImageView(image);</span>
+<span class="nc" id="L57">        load_csv_info();</span>
+<span class="nc" id="L58">        Group root = new Group();</span>
+<span class="nc" id="L59">        Scene scene = new Scene(root, 300,300);</span>
+
+<span class="nc" id="L61">        primaryStage.setScene(scene);</span>
+<span class="nc" id="L62">        primaryStage.setResizable(false);</span>
+<span class="nc" id="L63">        primaryStage.setTitle(&quot;Login&quot;);</span>
+
+        //Font for first two buttons
+<span class="nc" id="L66">        Font firstTwo_font = Font.font(&quot;Courier New&quot;, FontWeight.BOLD, 20);</span>
+
+        //Admin icon
+<span class="nc" id="L69">        Image admin_icon =  new Image(&quot;file:admin.png&quot;);</span>
+<span class="nc" id="L70">        ImageView ad_i = new ImageView(admin_icon);</span>
+
+        //text label
+<span class="nc" id="L73">        Font login_font = Font.font(&quot;verdana&quot;, FontWeight.BOLD, FontPosture.REGULAR, 25);</span>
+<span class="nc" id="L74">        Text login_text = create_text(43,80,&quot;Please login as :&quot;,login_font,root,Color.GOLD);</span>
+
+        //Admin Button
+<span class="nc" id="L77">        Button admin_button = create_button(120,25,100,190,</span>
+                &quot;Admin&quot;, firstTwo_font,ad_i);
+<span class="nc" id="L79">        admin_button.setOnAction(actionEvent -&gt; {</span>
+<span class="nc" id="L80">            enter_admin_action(primaryStage);</span>
+<span class="nc" id="L81">        });</span>
+
+        //User's icon
+<span class="nc" id="L84">        Image user_icon =  new Image(&quot;file:user.png&quot;);</span>
+<span class="nc" id="L85">        ImageView us_i = new ImageView(user_icon);</span>
+
+        //User Buttton
+<span class="nc" id="L88">        Button user_button = create_button(100,25,106,120,</span>
+                &quot;User&quot;, firstTwo_font,us_i);
+<span class="nc" id="L90">        user_button.setOnAction(actionEvent -&gt; {</span>
+<span class="nc" id="L91">            enter_user_action(primaryStage);</span>
+<span class="nc" id="L92">        });</span>
+
+<span class="nc" id="L94">        root.getChildren().addAll(mv,admin_button,user_button,login_text);</span>
+        //SHOW
+<span class="nc" id="L96">        primaryStage.show();</span>
+<span class="nc" id="L97">    }</span>
+
+    public void load_csv_info(){
+<span class="nc" id="L100">        HashMap&lt;String, HashMap&lt;String, String&gt;&gt; list =  readfile.fileInfor(&quot;src/main/resources/InitialExchangeRate.csv&quot;);</span>
+        //System.out.println(list);
+<span class="nc" id="L102">        ArrayList&lt;String&gt; keys = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        for (int i = 0; i&lt; list.size();i++){</span>
+            //keys.add(list.get[])
+        }
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        for (String s: list.keySet()){</span>
+<span class="nc" id="L107">            ArrayList&lt;String&gt; values = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L108">            date_curs.add(s);</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">            for (String s2 :list.get(s).keySet()){</span>
+<span class="nc" id="L110">                values.add(list.get(s).get(s2));</span>
+<span class="nc" id="L111">            }</span>
+<span class="nc" id="L112">            cur_values.put(s,values);</span>
+<span class="nc" id="L113">        }</span>
+<span class="nc" id="L114">        date_curs.add(0,&quot;-&quot;);</span>
+
+<span class="nc" id="L116">        RateWriter rw = new RateWriter();</span>
+<span class="nc" id="L117">        rw.setRateCurc(cur_values);</span>
+<span class="nc" id="L118">        rw.setCurcList(date_curs);</span>
+        try{
+<span class="nc" id="L120">            rw.rateWriter();</span>
+<span class="nc" id="L121">        }catch (Exception e){</span>
+<span class="nc" id="L122">            e.printStackTrace();</span>
+<span class="nc" id="L123">        }</span>
+
+
+<span class="nc" id="L126">    }</span>
+    public Button create_button(double width,double height, double x, double y,
+                                String text, Font font, ImageView img){
+
+<span class="nc" id="L130">        Button but = new Button(text,img);</span>
+<span class="nc" id="L131">        but.setMaxSize(width,height);</span>
+<span class="nc" id="L132">        but.setText(text);</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (font != null)</span>
+<span class="nc" id="L134">            but.setFont(font);</span>
+<span class="nc" id="L135">        but.setLayoutX(x);</span>
+<span class="nc" id="L136">        but.setLayoutY(y);</span>
+<span class="nc" id="L137">        return but;</span>
+    }
+    public TextField create_textfield(double x, double y, double width, double height, Font font, Group gp){
+<span class="nc" id="L140">        TextField tf = new TextField ();</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">        if (font != null)</span>
+<span class="nc" id="L142">            tf.setFont(font);</span>
+<span class="nc" id="L143">        tf.setLayoutX(x);</span>
+<span class="nc" id="L144">        tf.setLayoutY(y);</span>
+<span class="nc" id="L145">        tf.setMaxSize(width,height);</span>
+<span class="nc" id="L146">        gp.getChildren().add(tf);</span>
+<span class="nc" id="L147">        return tf;</span>
+    }
+
+    public Text create_text(double x, double y, String s, Font font, Group gp, Color c){
+<span class="nc" id="L151">        Text text = new Text();</span>
+<span class="nc" id="L152">        text.setText(s);</span>
+<span class="nc" id="L153">        text.setX(x);</span>
+<span class="nc" id="L154">        text.setY(y);</span>
+<span class="nc" id="L155">        text.setFont(font);</span>
+<span class="nc" id="L156">        text.setFill(c);</span>
+<span class="nc" id="L157">        return text;</span>
+    }
+    public RadioButton create_radiobutton(double x,double y, String s,Font font, Color c){
+<span class="nc" id="L160">        RadioButton rb = new RadioButton(s);</span>
+<span class="nc" id="L161">        rb.setFont(font);</span>
+<span class="nc" id="L162">        rb.setTextFill(c);</span>
+<span class="nc" id="L163">        rb.setLayoutX(x);</span>
+<span class="nc" id="L164">        rb.setLayoutY(y);</span>
+<span class="nc" id="L165">        return rb;</span>
+    }
+    public ChoiceBox&lt;String&gt; create_choicebox(double x, double y, double width , double height, Group gp){
+<span class="nc" id="L168">        ChoiceBox&lt;String&gt; cb = new ChoiceBox&lt;&gt;();</span>
+<span class="nc" id="L169">        cb.setMinWidth(width);</span>
+<span class="nc" id="L170">        cb.setMinHeight(height);</span>
+<span class="nc" id="L171">        cb.setLayoutX(x);</span>
+<span class="nc" id="L172">        cb.setLayoutY(y);</span>
+
+<span class="nc" id="L174">        gp.getChildren().add(cb);</span>
+<span class="nc" id="L175">        return cb;</span>
+    }
+    public void enter_admin_action(Stage stage){
+<span class="nc" id="L178">        System.out.println(&quot;Admin Received clicks&quot;);</span>
+<span class="nc" id="L179">        status = true;</span>
+<span class="nc" id="L180">        invoke_main_platform();</span>
+        //stage.close();
+<span class="nc" id="L182">    }</span>
+    public void enter_user_action(Stage stage){
+<span class="nc" id="L184">        System.out.println(&quot;User Received clicks&quot;);</span>
+<span class="nc" id="L185">        status = false;</span>
+<span class="nc" id="L186">        invoke_main_platform();</span>
+        //stage.close();
+<span class="nc" id="L188">    }</span>
+
+    public void invoke_main_platform(){
+<span class="nc" id="L191">        Stage stage_main = new Stage();</span>
+
+<span class="nc" id="L193">        Image image =  new Image(&quot;file:background.jpg&quot;);</span>
+<span class="nc" id="L194">        ImageView bg = new ImageView(image);</span>
+
+<span class="nc" id="L196">        Group root2 = new Group();</span>
+<span class="nc" id="L197">        root2.getChildren().add(bg);</span>
+<span class="nc" id="L198">        Scene scene_main = new Scene(root2, 1200,600);</span>
+<span class="nc" id="L199">        stage_main.setScene(scene_main);</span>
+<span class="nc" id="L200">        stage_main.setResizable(false);</span>
+<span class="nc" id="L201">        stage_main.setTitle(&quot;Currency converter&quot;);</span>
+
+<span class="nc" id="L203">        Font login_font = Font.font(&quot;verdana&quot;, FontWeight.BOLD, FontPosture.REGULAR, 25);</span>
+<span class="nc" id="L204">        Font firstTwo_font = Font.font(&quot;Arial&quot;, FontWeight.BOLD, 23);</span>
+
+
+        // left choice box
+<span class="nc" id="L208">        cb = create_choicebox(366,285,100,40,root2);</span>
+        //load items
+            //Currency types!
+<span class="nc" id="L211">        Set list = readfile.fileInfor(&quot;src/main/resources/InitialExchangeRate.csv&quot;).keySet();</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">        for (Object s: list)</span>
+<span class="nc" id="L213">            cb.getItems().addAll((String) s);</span>
+        //left text box
+<span class="nc" id="L215">        TextField left_hbox = create_textfield(133,285,120,70,firstTwo_font,root2);</span>
+        //right choice box
+<span class="nc" id="L217">        cb2 = create_choicebox(1200-133-100,285,100,40,root2);</span>
+        //load items
+<span class="nc bnc" id="L219" title="All 2 branches missed.">        for (Object s: list)</span>
+<span class="nc" id="L220">            cb2.getItems().addAll((String) s);</span>
+        //right text box
+<span class="nc" id="L222">        TextField right_hbox = create_textfield(1200-366-100,285,120,70,firstTwo_font,root2);</span>
+        //disable it
+<span class="nc" id="L224">        right_hbox.setDisable(true);</span>
+
+<span class="nc" id="L226">        cb.setOnAction(event -&gt; {</span>
+<span class="nc" id="L227">        });</span>
+
+        //convert Button
+<span class="nc" id="L230">        Button convert_button = create_button(120,25,540,390,</span>
+                &quot;Convert&quot;, firstTwo_font, null);
+<span class="nc" id="L232">        convert_button.setOnAction(actionEvent -&gt; {</span>
+<span class="nc" id="L233">            System.out.println();</span>
+<span class="nc" id="L234">            right_hbox.setText(Converter.convertCurrency(Double.valueOf(left_hbox.getText()),(String)cb.getValue(),(String)cb2.getValue(),&quot;src/main/resources/InitialExchangeRate.csv&quot;));</span>
+
+<span class="nc" id="L236">        });</span>
+<span class="nc" id="L237">        root2.getChildren().add(convert_button);</span>
+
+        //Table button
+<span class="nc" id="L240">        Button table_button = create_button(210,25,20,540,</span>
+                &quot;Display Table&quot;, firstTwo_font, null);
+<span class="nc" id="L242">        table_button.setOnAction(actionEvent -&gt; {</span>
+<span class="nc" id="L243">            invoke_table();</span>
+<span class="nc" id="L244">        });</span>
+<span class="nc" id="L245">        root2.getChildren().add(table_button);</span>
+
+        //rate history button
+<span class="nc" id="L248">        Button history_button = create_button(210,25,230,540,</span>
+                &quot;Rate History&quot;, firstTwo_font, null);
+<span class="nc" id="L250">        history_button.setOnAction(actionEvent -&gt; {</span>
+<span class="nc" id="L251">            invoke_history();</span>
+<span class="nc" id="L252">        });</span>
+<span class="nc" id="L253">        root2.getChildren().add(history_button);</span>
+        //Admin tools button
+
+<span class="nc" id="L256">        Button tools_button = create_button(213,25,1200-225,540,</span>
+                &quot;Update currency&quot;, firstTwo_font, null);
+<span class="nc" id="L258">        tools_button.setOnAction(actionEvent -&gt; {</span>
+<span class="nc" id="L259">            invoke_update();</span>
+<span class="nc" id="L260">        });</span>
+        //invoke setPop
+<span class="nc" id="L262">        Button setPop_button = create_button(213,25,1200-420,540,</span>
+                &quot;Set Popular&quot;, firstTwo_font, null);
+<span class="nc" id="L264">        setPop_button.setOnAction(actionEvent -&gt; {</span>
+<span class="nc" id="L265">            invoke_update1();</span>
+<span class="nc" id="L266">        });</span>
+
+<span class="nc bnc" id="L268" title="All 2 branches missed.">        if (status){</span>
+<span class="nc" id="L269">            root2.getChildren().add(tools_button);</span>
+        }
+
+<span class="nc bnc" id="L272" title="All 2 branches missed.">        if (status){</span>
+<span class="nc" id="L273">            root2.getChildren().add(setPop_button);</span>
+        }
+<span class="nc" id="L275">        stage_main.show();</span>
+<span class="nc" id="L276">    }</span>
+
+    public void invoke_table(){
+<span class="nc" id="L279">        Group table_root = new Group();</span>
+<span class="nc" id="L280">        Stage table_stage = new Stage();</span>
+<span class="nc" id="L281">        Scene table_scene= new Scene(table_root, 500,500);</span>
+<span class="nc" id="L282">        table_stage.setScene(table_scene);</span>
+<span class="nc" id="L283">        table_stage.setResizable(false);</span>
+<span class="nc" id="L284">        table_stage.setTitle(&quot;Popular currencies&quot;);</span>
+
+<span class="nc" id="L286">        Image image =  new Image(&quot;file:table_bg.jpg&quot;);</span>
+<span class="nc" id="L287">        ImageView bg = new ImageView(image);</span>
+<span class="nc" id="L288">        table_root.getChildren().add(bg);</span>
+        /*
+        Button edit_pop = create_button(40,30,460,470,&quot;Edit&quot;,null,null);
+        table_root.getChildren().add(edit_pop);
+        edit_pop.setOnAction(event -&gt; {
+            Group sub_root = new Group();
+            Stage sub_stage = new Stage();
+            Scene sub_scene= new Scene(sub_root, 500,80);
+            sub_stage.setScene(sub_scene);
+            sub_stage.setResizable(false);
+            sub_stage.show();
+        });*/
+
+<span class="nc" id="L301">        ArrayList&lt;String&gt; currencies = new ArrayList&lt;&gt;();</span>
+        //SHOULD BE LOADED FROM DATABASE
+<span class="nc" id="L303">        currencies.add(readfile.popularCurrency(&quot;src/main/resources/PopularCurrencies.csv&quot;).get(0));</span>
+<span class="nc" id="L304">        currencies.add(readfile.popularCurrency(&quot;src/main/resources/PopularCurrencies.csv&quot;).get(1));</span>
+<span class="nc" id="L305">        currencies.add(readfile.popularCurrency(&quot;src/main/resources/PopularCurrencies.csv&quot;).get(2));</span>
+<span class="nc" id="L306">        currencies.add(readfile.popularCurrency(&quot;src/main/resources/PopularCurrencies.csv&quot;).get(3));</span>
+
+        ///
+<span class="nc" id="L309">        int row_x = 150 - 20;</span>
+<span class="nc" id="L310">        int row_y = 50 + 10;</span>
+
+<span class="nc" id="L312">        Font firstTwo_font = Font.font(&quot;Arial&quot;, FontWeight.BOLD, 20);</span>
+
+<span class="nc bnc" id="L314" title="All 2 branches missed.">        for (String s : currencies){</span>
+<span class="nc" id="L315">            Text text = create_text(row_x,row_y,s,firstTwo_font,table_root,Color.GOLD);</span>
+<span class="nc" id="L316">            row_x += 100;</span>
+<span class="nc" id="L317">            table_root.getChildren().add(text);</span>
+<span class="nc" id="L318">        }</span>
+
+<span class="nc" id="L320">        row_x = 50 - 20;</span>
+<span class="nc" id="L321">        row_y = 150 + 10;</span>
+
+<span class="nc bnc" id="L323" title="All 2 branches missed.">        for (String s : currencies){</span>
+<span class="nc" id="L324">            Text text = create_text(row_x,row_y,s,firstTwo_font,table_root,Color.GOLD);</span>
+<span class="nc" id="L325">            row_y += 100;</span>
+<span class="nc" id="L326">            table_root.getChildren().add(text);</span>
+<span class="nc" id="L327">        }</span>
+
+<span class="nc" id="L329">        int row_x0 = 13 ;</span>
+<span class="nc" id="L330">        int row_y0 = 60 ;</span>
+<span class="nc" id="L331">        Text text1 = create_text(row_x0,row_y0,&quot;From/to&quot;,firstTwo_font,table_root,Color.GOLD);</span>
+<span class="nc" id="L332">        row_y0 += 100;</span>
+<span class="nc" id="L333">        table_root.getChildren().add(text1);</span>
+
+        // show all  the prices
+<span class="nc" id="L336">        row_x = 130;</span>
+<span class="nc" id="L337">        row_y = 160;</span>
+<span class="nc" id="L338">        int row_x1 = 130;</span>
+<span class="nc" id="L339">        int row_x2 = 130;</span>
+<span class="nc" id="L340">        int row_x3 = 130;</span>
+<span class="nc" id="L341">        int row_y1 = 260;</span>
+<span class="nc" id="L342">        int row_y2 = 360;</span>
+<span class="nc" id="L343">        int row_y3 = 460;</span>
+
+<span class="nc" id="L345">        int i = 0;</span>
+
+<span class="nc bnc" id="L347" title="All 2 branches missed.">        for (String d : currencies){</span>
+<span class="nc" id="L348">            String t = readfile.fileInfor(&quot;src/main/resources/InitialExchangeRate.csv&quot;).get(currencies.get(0)).get(d);</span>
+
+<span class="nc" id="L350">            Text text = create_text(row_x,row_y,t + arrow0[i],firstTwo_font,table_root,Color.GOLD);</span>
+<span class="nc bnc" id="L351" title="All 2 branches missed.">            if (!t.equals(&quot;-&quot;)){</span>
+
+<span class="nc bnc" id="L353" title="All 4 branches missed.">                if (Double.parseDouble(t) &gt; row0[i] &amp;&amp; row0[i] != 0.0 ){</span>
+<span class="nc" id="L354">                    arrow0[i] = &quot;(I)&quot;;</span>
+<span class="nc" id="L355">                    text.setText(t + arrow0[i]);</span>
+<span class="nc bnc" id="L356" title="All 4 branches missed.">                }else if (Double.parseDouble(t) &lt; row0[i] &amp;&amp; row0[i] != 0.0){</span>
+<span class="nc" id="L357">                    arrow0[i] = &quot;(D)&quot;;</span>
+<span class="nc" id="L358">                    text.setText(t + &quot;(D)&quot;);</span>
+                }
+<span class="nc" id="L360">                row0[i] = Double.parseDouble(t);</span>
+            }
+
+<span class="nc" id="L363">            row_x += 100;</span>
+<span class="nc" id="L364">            table_root.getChildren().add(text);</span>
+<span class="nc" id="L365">            i++;</span>
+<span class="nc" id="L366">        }</span>
+<span class="nc" id="L367">        i = 0;</span>
+<span class="nc bnc" id="L368" title="All 2 branches missed.">        for (String d : currencies){</span>
+<span class="nc" id="L369">            String t = readfile.fileInfor(&quot;src/main/resources/InitialExchangeRate.csv&quot;).get(currencies.get(1)).get(d);</span>
+
+<span class="nc" id="L371">            Text text = create_text(row_x1,row_y1,t + arrow1[i],firstTwo_font,table_root,Color.GOLD);</span>
+<span class="nc" id="L372">            row_x1 += 100;</span>
+<span class="nc bnc" id="L373" title="All 2 branches missed.">            if (!t.equals(&quot;-&quot;)){</span>
+
+<span class="nc bnc" id="L375" title="All 4 branches missed.">                if (Double.parseDouble(t) &gt; row1[i] &amp;&amp; row1[i] != 0.0){</span>
+<span class="nc" id="L376">                    arrow1[i] = &quot;(I)&quot;;</span>
+<span class="nc" id="L377">                    text.setText(t + &quot;(I)&quot;);</span>
+<span class="nc bnc" id="L378" title="All 4 branches missed.">                }else if (Double.parseDouble(t) &lt; row1[i] &amp;&amp; row1[i] != 0.0){</span>
+<span class="nc" id="L379">                    arrow1[i] = &quot;(D)&quot;;</span>
+<span class="nc" id="L380">                    text.setText(t + &quot;(D)&quot;);</span>
+                }
+<span class="nc" id="L382">                row1[i] = Double.parseDouble(t);</span>
+            }
+
+<span class="nc" id="L385">            table_root.getChildren().add(text);</span>
+<span class="nc" id="L386">            i++;</span>
+<span class="nc" id="L387">        }</span>
+<span class="nc" id="L388">        i = 0;</span>
+<span class="nc bnc" id="L389" title="All 2 branches missed.">        for (String d : currencies){</span>
+<span class="nc" id="L390">            String t = readfile.fileInfor(&quot;src/main/resources/InitialExchangeRate.csv&quot;).get(currencies.get(2)).get(d);</span>
+
+<span class="nc" id="L392">            Text text = create_text(row_x2,row_y2,t + arrow2[i],firstTwo_font,table_root,Color.GOLD);</span>
+<span class="nc bnc" id="L393" title="All 2 branches missed.">            if (!t.equals(&quot;-&quot;)){</span>
+
+<span class="nc bnc" id="L395" title="All 4 branches missed.">                if (Double.parseDouble(t) &gt; row2[i] &amp;&amp; row2[i] != 0.0){</span>
+<span class="nc" id="L396">                    arrow2[i] = &quot;(I)&quot;;</span>
+<span class="nc" id="L397">                    text.setText(t + &quot;(I)&quot;);</span>
+<span class="nc bnc" id="L398" title="All 4 branches missed.">                }else if (Double.parseDouble(t) &lt; row2[i] &amp;&amp; row2[i] != 0.0){</span>
+<span class="nc" id="L399">                    arrow2[i] = &quot;(D)&quot;;</span>
+<span class="nc" id="L400">                    text.setText(t + &quot;(D)&quot;);</span>
+                }
+<span class="nc" id="L402">                row2[i] = Double.parseDouble(t);</span>
+            }
+
+<span class="nc" id="L405">            row_x2 += 100;</span>
+<span class="nc" id="L406">            table_root.getChildren().add(text);</span>
+<span class="nc" id="L407">            i++;</span>
+<span class="nc" id="L408">        }</span>
+<span class="nc" id="L409">        i = 0;</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">        for (String d : currencies){</span>
+<span class="nc" id="L411">            String t = readfile.fileInfor(&quot;src/main/resources/InitialExchangeRate.csv&quot;).get(currencies.get(3)).get(d);</span>
+
+<span class="nc" id="L413">            Text text = create_text(row_x3,row_y3,t + arrow0[i],firstTwo_font,table_root,Color.GOLD);</span>
+<span class="nc" id="L414">            row_x3 += 100;</span>
+<span class="nc bnc" id="L415" title="All 2 branches missed.">            if (!t.equals(&quot;-&quot;)){</span>
+
+<span class="nc bnc" id="L417" title="All 4 branches missed.">                if (Double.parseDouble(t) &gt; row3[i] &amp;&amp; row3[i] != 0.0){</span>
+<span class="nc" id="L418">                    arrow3[i] = &quot;(I)&quot;;</span>
+<span class="nc" id="L419">                    text.setText(t + &quot;(I)&quot;);</span>
+<span class="nc bnc" id="L420" title="All 4 branches missed.">                }else if (Double.parseDouble(t) &lt; row3[i] &amp;&amp; row3[i] != 0.0){</span>
+<span class="nc" id="L421">                    arrow3[i] = &quot;(D)&quot;;</span>
+<span class="nc" id="L422">                    text.setText(t + &quot;(D)&quot;);</span>
+                }
+<span class="nc" id="L424">                row3[i] = Double.parseDouble(t);</span>
+            }
+
+<span class="nc" id="L427">            table_root.getChildren().add(text);</span>
+<span class="nc" id="L428">            i++;</span>
+<span class="nc" id="L429">        }</span>
+<span class="nc" id="L430">        table_stage.show();</span>
+<span class="nc" id="L431">    }</span>
+
+    public void invoke_history(){
+<span class="nc" id="L434">        Group history_root = new Group();</span>
+<span class="nc" id="L435">        Stage history_stage = new Stage();</span>
+<span class="nc" id="L436">        Scene history_scene= new Scene(history_root, 500,500);</span>
+<span class="nc" id="L437">        history_stage.setScene(history_scene);</span>
+<span class="nc" id="L438">        history_stage.setResizable(false);</span>
+<span class="nc" id="L439">        history_stage.setTitle(&quot;Rate History&quot;);</span>
+
+<span class="nc" id="L441">        Image image =  new Image(&quot;file:update.jpg&quot;);</span>
+<span class="nc" id="L442">        ImageView bg = new ImageView(image);</span>
+<span class="nc" id="L443">        history_root.getChildren().add(bg);</span>
+
+<span class="nc" id="L445">        ChoiceBox from_year = create_choicebox(10,100,80,25,history_root);</span>
+<span class="nc" id="L446">        ChoiceBox from_mon = create_choicebox(100,100,50,25,history_root);</span>
+<span class="nc" id="L447">        ChoiceBox from_day = create_choicebox(160,100,50,25,history_root);</span>
+
+<span class="nc" id="L449">        ChoiceBox to_year = create_choicebox(290,100,80,25,history_root);</span>
+<span class="nc" id="L450">        ChoiceBox to_mon = create_choicebox(380,100,50,25,history_root);</span>
+<span class="nc" id="L451">        ChoiceBox to_day = create_choicebox(440,100,50,25,history_root);</span>
+
+<span class="nc" id="L453">        Button find = create_button(80,30,225,150,&quot;Browse&quot;,null,null);</span>
+<span class="nc" id="L454">        history_root.getChildren().add(find);</span>
+
+<span class="nc" id="L456">        int year = 1970;</span>
+<span class="nc bnc" id="L457" title="All 2 branches missed.">        while (year&lt;2023){</span>
+<span class="nc" id="L458">            from_year.getItems().add(String.valueOf(year));</span>
+<span class="nc" id="L459">            to_year.getItems().add(String.valueOf(year));</span>
+<span class="nc" id="L460">            year++;</span>
+        }
+<span class="nc" id="L462">        int month = 1;</span>
+<span class="nc bnc" id="L463" title="All 2 branches missed.">        while (month&lt;13){</span>
+<span class="nc bnc" id="L464" title="All 2 branches missed.">            if (month&lt;10) {</span>
+<span class="nc" id="L465">                from_mon.getItems().add(&quot;0&quot; + String.valueOf(month));</span>
+<span class="nc" id="L466">                to_mon.getItems().add(&quot;0&quot; + String.valueOf(month));</span>
+            }else{
+<span class="nc" id="L468">                from_mon.getItems().add(String.valueOf(month));</span>
+<span class="nc" id="L469">                to_mon.getItems().add(String.valueOf(month));</span>
+            }
+
+<span class="nc" id="L472">            month++;</span>
+        }
+<span class="nc" id="L474">        int day = 1;</span>
+<span class="nc bnc" id="L475" title="All 2 branches missed.">        while (day&lt;32){</span>
+<span class="nc bnc" id="L476" title="All 2 branches missed.">            if (day&lt;10) {</span>
+<span class="nc" id="L477">                from_day.getItems().add(&quot;0&quot;+String.valueOf(day));</span>
+<span class="nc" id="L478">                to_day.getItems().add(&quot;0&quot;+String.valueOf(day));</span>
+            }else{
+<span class="nc" id="L480">                from_day.getItems().add(String.valueOf(day));</span>
+<span class="nc" id="L481">                to_day.getItems().add(String.valueOf(day));</span>
+            }
+<span class="nc" id="L483">            day++;</span>
+        }
+
+<span class="nc" id="L486">        from_year.setValue(&quot;YY&quot;);</span>
+<span class="nc" id="L487">        from_mon.setValue(&quot;MM&quot;);</span>
+<span class="nc" id="L488">        from_day.setValue(&quot;DD&quot;);</span>
+<span class="nc" id="L489">        to_year.setValue(&quot;YY&quot;);</span>
+<span class="nc" id="L490">        to_mon.setValue(&quot;MM&quot;);</span>
+<span class="nc" id="L491">        to_day.setValue(&quot;DD&quot;);</span>
+
+<span class="nc" id="L493">        ChoiceBox from_cur = create_choicebox(50,150,100,30,history_root);</span>
+<span class="nc" id="L494">        ChoiceBox to_cur = create_choicebox(350,150,100,30,history_root);</span>
+
+<span class="nc" id="L496">        Set curs = readfile.fileInfor(&quot;src/main/resources/InitialExchangeRate.csv&quot;).keySet();</span>
+
+<span class="nc bnc" id="L498" title="All 2 branches missed.">        for (Object s: curs) {</span>
+<span class="nc" id="L499">            from_cur.getItems().addAll((String) s);</span>
+<span class="nc" id="L500">            to_cur.getItems().addAll((String) s);</span>
+<span class="nc" id="L501">        }</span>
+
+<span class="nc" id="L503">        Font firstTwo_font = Font.font(&quot;Arial&quot;, FontWeight.BOLD, 20);</span>
+<span class="nc" id="L504">        Text ft = create_text(215,50,&quot;From/To&quot;,firstTwo_font,history_root,Color.GOLD);</span>
+<span class="nc" id="L505">        Text ave_t = create_text(50,210,&quot;&quot;,firstTwo_font,history_root,Color.GOLD);</span>
+<span class="nc" id="L506">        Text min_t = create_text(50,260,&quot;&quot;,firstTwo_font,history_root,Color.GOLD);</span>
+<span class="nc" id="L507">        Text max_t = create_text(50,310,&quot;&quot;,firstTwo_font,history_root,Color.GOLD);</span>
+<span class="nc" id="L508">        Text median_t = create_text(50,360,&quot;&quot;,firstTwo_font,history_root,Color.GOLD);</span>
+<span class="nc" id="L509">        Text sd_t = create_text(50,410,&quot;&quot;,firstTwo_font,history_root,Color.GOLD);</span>
+<span class="nc" id="L510">        Text rates_t = create_text(50,460,&quot;&quot;,firstTwo_font,history_root,Color.GOLD);</span>
+
+<span class="nc" id="L512">        RateHistory rh = new RateHistory();</span>
+
+<span class="nc" id="L514">        history_root.getChildren().addAll(ave_t,min_t,max_t,median_t,sd_t,rates_t,ft);</span>
+
+<span class="nc" id="L516">        find.setOnAction(event -&gt; {</span>
+
+<span class="nc" id="L518">            String start_date = from_year.getValue() +&quot;/&quot;+(String)from_mon.getValue()+&quot;/&quot;+(String)from_day.getValue();</span>
+<span class="nc" id="L519">            String end_date = to_year.getValue() +&quot;/&quot;+(String)to_mon.getValue()+&quot;/&quot;+(String)to_mon.getValue();</span>
+
+<span class="nc" id="L521">            String cur1 = (String) from_cur.getValue();</span>
+<span class="nc" id="L522">            String cur2 = (String) to_cur.getValue() ;</span>
+<span class="nc" id="L523">            double[] list = rh.doOperation(start_date,cur1,cur2,end_date);</span>
+            //ave min max median sd
+<span class="nc" id="L525">            double ave = list[0];</span>
+<span class="nc" id="L526">            double min = list[1];</span>
+<span class="nc" id="L527">            double max = list[2];</span>
+<span class="nc" id="L528">            double median = list[3];</span>
+<span class="nc" id="L529">            double sd = list[4];</span>
+<span class="nc" id="L530">            ArrayList&lt;Double&gt; rates = rh.RateCalList;</span>
+
+<span class="nc" id="L532">            String ave_s = &quot;Average: &quot;;</span>
+<span class="nc" id="L533">            String min_s = &quot;Minimum: &quot;;</span>
+<span class="nc" id="L534">            String max_s = &quot;Maximum: &quot;;</span>
+<span class="nc" id="L535">            String median_s = &quot;Median: &quot;;</span>
+<span class="nc" id="L536">            String sd_s = &quot;Standard deviation: &quot;;</span>
+<span class="nc" id="L537">            String rates_s = &quot;Rates: &quot; ;</span>
+
+<span class="nc" id="L539">            ave_s += String.valueOf(ave);</span>
+<span class="nc" id="L540">            min_s += String.valueOf(min);</span>
+<span class="nc" id="L541">            max_s += String.valueOf(max);</span>
+<span class="nc" id="L542">            median_s += String.valueOf(median);</span>
+<span class="nc" id="L543">            sd_s += String.valueOf(sd);</span>
+<span class="nc" id="L544">            rates_s += rates.toString();</span>
+            //rates_t += String.valueOf(list);
+<span class="nc" id="L546">            ave_t.setText(ave_s);</span>
+<span class="nc" id="L547">            min_t.setText(min_s);</span>
+<span class="nc" id="L548">            max_t.setText(max_s);</span>
+<span class="nc" id="L549">            median_t.setText(median_s);</span>
+<span class="nc" id="L550">            sd_t.setText(sd_s);</span>
+<span class="nc" id="L551">            rates_t.setText(rates_s);</span>
+<span class="nc" id="L552">        });</span>
+
+<span class="nc" id="L554">        Alert date_alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L555">        boolean pass = false;</span>
+<span class="nc bnc" id="L556" title="All 2 branches missed.">        if (!pass){</span>
+<span class="nc" id="L557">            date_alert.setContentText(&quot;Invalid input of time!&quot;);</span>
+            //date_alert.show();
+        }
+
+<span class="nc" id="L561">        history_stage.show();</span>
+<span class="nc" id="L562">    }</span>
+
+    public String edit_hint_message(String selected){
+<span class="nc" id="L565">        String s = &quot;Please input exchange rate for other currencies in sequence: \n&quot;;</span>
+<span class="nc" id="L566">        ArrayList&lt;String&gt; curs = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L567" title="All 2 branches missed.">        for (int i = 1; i&lt; date_curs.size();i++){</span>
+<span class="nc" id="L568">            curs.add(date_curs.get(i));</span>
+        }//KEYSET() WILL SORT THE LIST OF KEYS, SOMEHOW :)
+<span class="nc bnc" id="L570" title="All 2 branches missed.">        for (String key: curs){</span>
+<span class="nc" id="L571">            s += &quot; &quot;;</span>
+<span class="nc bnc" id="L572" title="All 2 branches missed.">            if (!key.equals(selected))</span>
+<span class="nc" id="L573">                s += key;</span>
+<span class="nc" id="L574">        }</span>
+<span class="nc" id="L575">        s += &quot;\n&quot;;</span>
+<span class="nc" id="L576">        s += &quot;(Seperate by one space)&quot;;</span>
+<span class="nc" id="L577">        return s;</span>
+    }
+    public String add_hint_message(){
+<span class="nc" id="L580">        String s = &quot;Please input exchange rate for other currencies in sequence: \n&quot;;</span>
+<span class="nc" id="L581">        ArrayList&lt;String&gt; curs = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L582" title="All 2 branches missed.">        for (int i = 1; i&lt; date_curs.size();i++){</span>
+<span class="nc" id="L583">            curs.add(date_curs.get(i));</span>
+        }//KEYSET() WILL SORT THE LIST OF KEYS, SOMEHOW :)
+<span class="nc bnc" id="L585" title="All 2 branches missed.">        for (String key: curs){</span>
+<span class="nc" id="L586">            s += &quot; &quot;;</span>
+<span class="nc" id="L587">            s += key;</span>
+<span class="nc" id="L588">        }</span>
+<span class="nc" id="L589">        s += &quot;\n&quot;;</span>
+<span class="nc" id="L590">        s += &quot;(Seperate by one space)&quot;;</span>
+<span class="nc" id="L591">        return s;</span>
+    }
+    public void invoke_update(){
+<span class="nc" id="L594">        Group update_root = new Group();</span>
+<span class="nc" id="L595">        Stage update_stage = new Stage();</span>
+<span class="nc" id="L596">        Scene update_scene= new Scene(update_root, 500,500);</span>
+<span class="nc" id="L597">        update_stage.setScene(update_scene);</span>
+<span class="nc" id="L598">        update_stage.setResizable(false);</span>
+<span class="nc" id="L599">        update_stage.setTitle(&quot;Update currencies&quot;);</span>
+
+<span class="nc" id="L601">        Image image =  new Image(&quot;file:update.jpg&quot;);</span>
+<span class="nc" id="L602">        ImageView bg = new ImageView(image);</span>
+<span class="nc" id="L603">        update_root.getChildren().add(bg);</span>
+
+<span class="nc" id="L605">        Font small = Font.font(&quot;Arial&quot;, FontWeight.BOLD, 15);</span>
+
+        // edit area
+<span class="nc" id="L608">        RadioButton edit = create_radiobutton(50,100,&quot;Edit&quot;,small,Color.GOLD);</span>
+<span class="nc" id="L609">        RadioButton add = create_radiobutton(50,153*2-25,&quot;Add&quot;,small,Color.GOLD);</span>
+        //RadioButton del = create_radiobutton(50,133*3-25,&quot;Delete&quot;,small,Color.GOLD);
+
+<span class="nc" id="L612">        ToggleGroup group = new ToggleGroup();</span>
+<span class="nc" id="L613">        edit.setToggleGroup(group);</span>
+<span class="nc" id="L614">        add.setToggleGroup(group);</span>
+        //del.setToggleGroup(group);
+
+<span class="nc" id="L617">        TextField edit_date = create_textfield(150,100,100,25,null,update_root);</span>
+<span class="nc" id="L618">        edit_date.setPromptText(&quot;Enter Date&quot;);</span>
+<span class="nc" id="L619">        edit_date.getParent().requestFocus();</span>
+<span class="nc" id="L620">        ChoiceBox edit_cur = create_choicebox(280,100,100,25,update_root);</span>
+<span class="nc" id="L621">        TextField edit_num = create_textfield(150,143+60,300,25,null,update_root);</span>
+<span class="nc" id="L622">        edit_num.setMinWidth(300);</span>
+<span class="nc" id="L623">        Button edit_but = create_button(50,25,410,100,&quot;Save&quot;,null,null);</span>
+
+<span class="nc" id="L625">        Set list = readfile.fileInfor(&quot;src/main/resources/InitialExchangeRate.csv&quot;).keySet();</span>
+<span class="nc bnc" id="L626" title="All 2 branches missed.">        for (Object s: list)</span>
+<span class="nc" id="L627">            edit_cur.getItems().addAll((String) s);</span>
+
+<span class="nc" id="L629">        update_root.getChildren().add(edit_but);</span>
+<span class="nc" id="L630">        update_root.getChildren().addAll(edit,add);</span>
+<span class="nc" id="L631">        edit_date.setDisable(true);</span>
+<span class="nc" id="L632">        edit_cur.setDisable(true);</span>
+<span class="nc" id="L633">        edit_num.setDisable(true);</span>
+<span class="nc" id="L634">        edit_but.setDisable(true);</span>
+
+        //ADD
+<span class="nc" id="L637">        TextField add_date = create_textfield(150,153*2-28,100,25,null,update_root);</span>
+<span class="nc" id="L638">        add_date.setPromptText(&quot;Enter Date&quot;);</span>
+<span class="nc" id="L639">        add_date.getParent().requestFocus();</span>
+<span class="nc" id="L640">        TextField add_cur = create_textfield(280,153*2-28,100,25,null,update_root);</span>
+<span class="nc" id="L641">        add_cur.setPromptText(&quot;Enter Currency&quot;);</span>
+<span class="nc" id="L642">        add_cur.getParent().requestFocus();</span>
+<span class="nc" id="L643">        TextField add_value = create_textfield(150,153*2-28+100,300,25,null,update_root);</span>
+<span class="nc" id="L644">        add_value.setMinWidth(300);</span>
+<span class="nc" id="L645">        Button add_but = create_button(50,25,410,153*2-28,&quot;Add&quot;,null,null);</span>
+
+
+<span class="nc" id="L648">        Text hint0 = new Text(&quot;&quot;);</span>
+<span class="nc" id="L649">        hint0.setFill(Color.YELLOW);</span>
+<span class="nc" id="L650">        hint0.setX(150);</span>
+<span class="nc" id="L651">        hint0.setY(150);</span>
+<span class="nc" id="L652">        update_root.getChildren().add(hint0);</span>
+        //Edit choice box small event
+<span class="nc" id="L654">        edit_cur.setOnAction(event -&gt; {</span>
+<span class="nc" id="L655">            String s0 = edit_hint_message((String) edit_cur.getValue());</span>
+<span class="nc" id="L656">            hint0.setText(s0);</span>
+<span class="nc" id="L657">        });</span>
+
+        // ADD HINTS
+<span class="nc" id="L660">        String s = add_hint_message();</span>
+<span class="nc" id="L661">        Text hint = new Text();</span>
+<span class="nc" id="L662">        hint.setText(s);</span>
+<span class="nc" id="L663">        hint.setFill(Color.YELLOW);</span>
+<span class="nc" id="L664">        hint.setX(150);</span>
+<span class="nc" id="L665">        hint.setY(153*2-28+50+5);</span>
+<span class="nc" id="L666">        update_root.getChildren().add(hint);</span>
+
+        //basic settings
+<span class="nc" id="L669">        update_root.getChildren().add(add_but);</span>
+<span class="nc" id="L670">        add_value.setDisable(true);</span>
+<span class="nc" id="L671">        add_date.setDisable(true);</span>
+<span class="nc" id="L672">        add_but.setDisable(true);</span>
+<span class="nc" id="L673">        add_cur.setDisable(true);</span>
+        //DEL
+        /*
+        ChoiceBox del_cur = create_choicebox(150,133*3-28,100,25,update_root);
+        Button del_but = create_button(70,25,280,133*3-28,&quot;Delete&quot;,null,null);
+        update_root.getChildren().add(del_but);
+        del_cur.setDisable(true);
+        del_but.setDisable(true);
+        */
+        //events
+<span class="nc" id="L683">        edit.setOnAction(event -&gt; {</span>
+<span class="nc" id="L684">            edit_cur.setDisable(false);</span>
+<span class="nc" id="L685">            edit_num.setDisable(false);</span>
+<span class="nc" id="L686">            edit_but.setDisable(false);</span>
+<span class="nc" id="L687">            edit_date.setDisable(false);</span>
+            //del_cur.setDisable(true);
+            //del_but.setDisable(true);
+
+<span class="nc" id="L691">            add_but.setDisable(true);</span>
+<span class="nc" id="L692">            add_date.setDisable(true);</span>
+<span class="nc" id="L693">            add_cur.setDisable(true);</span>
+<span class="nc" id="L694">            add_value.setDisable(true);</span>
+
+<span class="nc" id="L696">        });</span>
+        /*
+        del.setOnAction(event -&gt; {
+            edit_cur.setDisable(true);
+            edit_num.setDisable(true);
+            edit_but.setDisable(true);
+
+            //del_cur.setDisable(false);
+            //del_but.setDisable(false);
+
+            add_but.setDisable(true);
+            add_date.setDisable(true);
+            add_cur.setDisable(true);
+            add_value.setDisable(true);
+
+        });
+        */
+
+<span class="nc" id="L714">        add.setOnAction(event -&gt; {</span>
+<span class="nc" id="L715">            edit_cur.setDisable(true);</span>
+<span class="nc" id="L716">            edit_num.setDisable(true);</span>
+<span class="nc" id="L717">            edit_but.setDisable(true);</span>
+<span class="nc" id="L718">            edit_date.setDisable(true);</span>
+            //del_cur.setDisable(true);
+            //del_but.setDisable(true);
+
+<span class="nc" id="L722">            add_but.setDisable(false);</span>
+<span class="nc" id="L723">            add_date.setDisable(false);</span>
+<span class="nc" id="L724">            add_cur.setDisable(false);</span>
+<span class="nc" id="L725">            add_value.setDisable(false);</span>
+
+<span class="nc" id="L727">        });</span>
+        //EDIT FUNCTION
+<span class="nc" id="L729">        edit_but.setOnAction(event -&gt;{</span>
+<span class="nc" id="L730">            rw.setCurcList(date_curs);//date,cur1,cur2......</span>
+<span class="nc" id="L731">            rw.setRateCurc(cur_values);//cur1 = value... cur2 = value...</span>
+
+<span class="nc" id="L733">            ArrayList&lt;String&gt; values = new ArrayList&lt;&gt;(Arrays.asList(edit_num.getText().split(&quot; &quot;)));</span>
+
+<span class="nc bnc" id="L735" title="All 2 branches missed.">            if (values.size() != cur_values.keySet().size()-1) {</span>
+<span class="nc" id="L736">                a.setAlertType(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L737">                a.setContentText(alert_add);</span>
+<span class="nc" id="L738">                a.show();</span>
+<span class="nc bnc" id="L739" title="All 2 branches missed.">            }else if (edit_date.getText().split(&quot;/&quot;).length != 3){</span>
+<span class="nc" id="L740">                a.setAlertType(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L741">                a.setContentText(&quot;Please input data as YY/MM/DD&quot;);</span>
+<span class="nc" id="L742">                a.show();</span>
+
+            }else{
+<span class="nc" id="L745">                boolean isnew = true;</span>
+<span class="nc bnc" id="L746" title="All 2 branches missed.">                if(edit_date.getText().equals(date_curs.get(0)))</span>
+<span class="nc" id="L747">                    isnew = false;</span>
+
+<span class="nc" id="L749">                ArrayList&lt;String&gt; curs = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L750" title="All 2 branches missed.">                for (int i = 1; i&lt; date_curs.size();i++)</span>
+<span class="nc" id="L751">                    curs.add(date_curs.get(i));</span>
+
+<span class="nc" id="L753">                int index_selected = curs.indexOf(edit_cur.getValue());//index of selected currency</span>
+<span class="nc" id="L754">                values.add(index_selected,&quot;-&quot;);// FILL ITS PLACE WITH NOTHING</span>
+<span class="nc" id="L755">                int index = curs.indexOf(edit_cur.getValue());</span>
+<span class="nc" id="L756">                int i = 0;</span>
+
+<span class="nc bnc" id="L758" title="All 2 branches missed.">                for (ArrayList&lt;String&gt; strings : cur_values.values()){</span>
+<span class="nc" id="L759">                    strings.set(index, values.get(i));</span>
+<span class="nc" id="L760">                    i++;</span>
+<span class="nc" id="L761">                }</span>
+
+
+<span class="nc" id="L764">                rw.setCurcList(date_curs);</span>
+<span class="nc" id="L765">                rw.setRateCurc(cur_values);</span>
+<span class="nc" id="L766">                rw.rateEditer((String) edit_cur.getValue(),values,edit_date.getText());</span>
+
+<span class="nc" id="L768">                Alert success = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L769">                success.setContentText(&quot;Success!&quot;);</span>
+<span class="nc" id="L770">                success.show();</span>
+<span class="nc" id="L771">                String s2 = add_hint_message();</span>
+<span class="nc" id="L772">                hint.setText(s2);</span>
+            }
+
+
+<span class="nc" id="L776">        });</span>
+        //ADD FUNCTION
+<span class="nc" id="L778">        add_but.setOnAction(event -&gt; {</span>
+<span class="nc" id="L779">            String cur = add_cur.getText();</span>
+<span class="nc" id="L780">            String new_date = add_date.getText();</span>
+<span class="nc" id="L781">            String new_values = add_value.getText();</span>
+
+<span class="nc" id="L783">            ArrayList&lt;String&gt; values = new ArrayList&lt;&gt;(Arrays.asList(new_values.split(&quot; &quot;)));</span>
+
+<span class="nc bnc" id="L785" title="All 2 branches missed.">            if (values.size() != cur_values.keySet().size()){</span>
+<span class="nc" id="L786">                a.setAlertType(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L787">                a.setContentText(alert_add);</span>
+<span class="nc" id="L788">                a.show();</span>
+<span class="nc bnc" id="L789" title="All 2 branches missed.">            }else if (add_date.getText().split(&quot;/&quot;).length != 3){</span>
+<span class="nc" id="L790">                a.setAlertType(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L791">                a.setContentText(&quot;Please input data as YY/MM/DD&quot;);</span>
+<span class="nc" id="L792">                a.show();</span>
+            }else{
+<span class="nc" id="L794">                values.add(&quot;- &quot;);</span>
+<span class="nc" id="L795">                date_curs.set(0,new_date);//update date</span>
+<span class="nc" id="L796">                date_curs.add(cur);//add a column for the new currency</span>
+<span class="nc" id="L797">                cur_values.put(cur,values);</span>
+<span class="nc" id="L798">                System.out.println(cur_values);</span>
+<span class="nc" id="L799">                int k = 0;</span>
+<span class="nc bnc" id="L800" title="All 2 branches missed.">                for (int i = 1; i &lt; date_curs.size()-1;i++){</span>
+<span class="nc" id="L801">                    ArrayList&lt;String&gt; r = cur_values.get(date_curs.get(i));</span>
+<span class="nc" id="L802">                    double goal = 1/Double.parseDouble(values.get(k));</span>
+
+<span class="nc" id="L804">                    r.add(String.format(&quot;%.2f&quot;,goal));</span>
+<span class="nc" id="L805">                    cur_values.put(date_curs.get(i), r);</span>
+<span class="nc" id="L806">                    System.out.println(r);</span>
+<span class="nc" id="L807">                    k++;</span>
+                }
+
+<span class="nc" id="L810">                rw.setCurcList(date_curs);//date,cur1,cur2......</span>
+<span class="nc" id="L811">                rw.setRateCurc(cur_values);//cur1 = value... cur2 = value...</span>
+
+                try {
+                    //rw.rateEditer(cur,values,new_date,true);
+<span class="nc" id="L815">                    rw.rateWriter();</span>
+<span class="nc" id="L816">                    cb.getItems().add(cur);</span>
+<span class="nc" id="L817">                    cb2.getItems().add(cur);</span>
+<span class="nc" id="L818">                    edit_cur.getItems().add(cur);</span>
+<span class="nc" id="L819">                    Alert success = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L820">                    success.setContentText(&quot;Success!&quot;);</span>
+<span class="nc" id="L821">                    success.show();</span>
+<span class="nc" id="L822">                    String s2 = add_hint_message();</span>
+<span class="nc" id="L823">                    hint.setText(s2);</span>
+
+
+<span class="nc" id="L826">                } catch (Exception e) {</span>
+<span class="nc" id="L827">                    throw new RuntimeException(e);</span>
+<span class="nc" id="L828">                }</span>
+            }
+<span class="nc" id="L830">        });</span>
+
+<span class="nc" id="L832">        update_stage.show();</span>
+<span class="nc" id="L833">    }</span>
+    public void invoke_update1(){
+<span class="nc" id="L835">        Group update_root = new Group();</span>
+<span class="nc" id="L836">        Stage update_stage = new Stage();</span>
+<span class="nc" id="L837">        Scene update_scene= new Scene(update_root, 500,500);</span>
+<span class="nc" id="L838">        update_stage.setScene(update_scene);</span>
+<span class="nc" id="L839">        update_stage.setResizable(false);</span>
+<span class="nc" id="L840">        update_stage.setTitle(&quot;Set Popular currencies&quot;);</span>
+<span class="nc" id="L841">        Image image =  new Image(&quot;file:update.jpg&quot;);</span>
+<span class="nc" id="L842">        ImageView bg = new ImageView(image);</span>
+<span class="nc" id="L843">        update_root.getChildren().add(bg);</span>
+<span class="nc" id="L844">        Font small = Font.font(&quot;Arial&quot;, FontWeight.BOLD, 15);</span>
+
+        // edit area
+<span class="nc" id="L847">        RadioButton edit = create_radiobutton(50,100,&quot;Set&quot;,small,Color.GOLD);</span>
+
+<span class="nc" id="L849">        ToggleGroup group = new ToggleGroup();</span>
+<span class="nc" id="L850">        edit.setToggleGroup(group);</span>
+
+<span class="nc" id="L852">        ChoiceBox edit_cur1 = create_choicebox(270,100,20,25,update_root);</span>
+<span class="nc" id="L853">        ChoiceBox edit_cur2 = create_choicebox(200,100,20,25,update_root);</span>
+<span class="nc" id="L854">        ChoiceBox edit_cur3 = create_choicebox(130,100,20,25,update_root);</span>
+<span class="nc" id="L855">        ChoiceBox edit_cur = create_choicebox(340,100,20,25,update_root);</span>
+
+
+<span class="nc" id="L858">        Button edit_but = create_button(50,25,410,100,&quot;Save&quot;,null,null);</span>
+
+<span class="nc" id="L860">        Set list = readfile.fileInfor(&quot;src/main/resources/InitialExchangeRate.csv&quot;).keySet();</span>
+
+<span class="nc bnc" id="L862" title="All 2 branches missed.">        for (Object s: list)</span>
+<span class="nc" id="L863">            edit_cur.getItems().addAll((String) s);</span>
+<span class="nc bnc" id="L864" title="All 2 branches missed.">        for (Object s: list)</span>
+<span class="nc" id="L865">            edit_cur1.getItems().addAll((String) s);</span>
+<span class="nc bnc" id="L866" title="All 2 branches missed.">        for (Object s: list)</span>
+<span class="nc" id="L867">            edit_cur2.getItems().addAll((String) s);</span>
+<span class="nc bnc" id="L868" title="All 2 branches missed.">        for (Object s: list)</span>
+<span class="nc" id="L869">            edit_cur3.getItems().addAll((String) s);</span>
+
+<span class="nc" id="L871">        update_root.getChildren().add(edit_but);</span>
+<span class="nc" id="L872">        update_root.getChildren().addAll(edit);</span>
+
+<span class="nc" id="L874">        edit_cur.setDisable(true);</span>
+<span class="nc" id="L875">        edit_cur1.setDisable(true);</span>
+<span class="nc" id="L876">        edit_cur2.setDisable(true);</span>
+<span class="nc" id="L877">        edit_cur3.setDisable(true);</span>
+<span class="nc" id="L878">        edit_but.setDisable(true);</span>
+
+<span class="nc" id="L880">        Text hint0 = new Text(&quot;&quot;);</span>
+<span class="nc" id="L881">        hint0.setFill(Color.YELLOW);</span>
+<span class="nc" id="L882">        hint0.setX(150);</span>
+<span class="nc" id="L883">        hint0.setY(150);</span>
+<span class="nc" id="L884">        update_root.getChildren().add(hint0);</span>
+
+        //basic settings
+<span class="nc" id="L887">        edit.setOnAction(event -&gt; {</span>
+<span class="nc" id="L888">            edit_cur.setDisable(false);</span>
+<span class="nc" id="L889">            edit_cur1.setDisable(false);</span>
+<span class="nc" id="L890">            edit_cur2.setDisable(false);</span>
+<span class="nc" id="L891">            edit_cur3.setDisable(false);</span>
+<span class="nc" id="L892">            edit_but.setDisable(false);</span>
+
+<span class="nc" id="L894">        });</span>
+        //EDIT FUNCTION
+<span class="nc" id="L896">        edit_but.setOnAction(event -&gt;{</span>
+<span class="nc" id="L897">            ArrayList&lt;String&gt; ar = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L898">            ar.add((String) edit_cur1.getValue());</span>
+<span class="nc" id="L899">            ar.add((String) edit_cur2.getValue());</span>
+<span class="nc" id="L900">            ar.add((String) edit_cur3.getValue());</span>
+<span class="nc" id="L901">            ar.add((String) edit_cur.getValue());</span>
+<span class="nc" id="L902">            PopCWriter pc = new PopCWriter();</span>
+            try {
+<span class="nc" id="L904">                pc.PopWriter(ar);</span>
+<span class="nc" id="L905">            } catch (Exception e) {</span>
+<span class="nc" id="L906">                throw new RuntimeException(e);</span>
+<span class="nc" id="L907">            }</span>
+<span class="nc" id="L908">        });</span>
+<span class="nc" id="L909">        update_stage.show();</span>
+<span class="nc" id="L910">    }</span>
+
+
+    public static void main(String[] args) {
+<span class="nc" id="L914">        launch(args);</span>
+
+<span class="nc" id="L916">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

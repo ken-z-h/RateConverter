@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RateHistory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assg1</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">RateHistory.java</span></div><h1>RateHistory.java</h1><pre class="source lang-java linenums">import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class RateHistory implements Selector{
+
+    private String csv;//
+    private BufferedReader br;
+    private String line;//
+    private String csvSplit;//
+    private Scanner scanner;
+    private HashMap&lt;String,String[]&gt; CatalogMap;//
+    private String date;//
+    private boolean ApproachStart;//
+    public ArrayList&lt;Double&gt; RateCalList;//
+    private String eL;
+    private String[] message;
+
+<span class="fc" id="L23">    public RateHistory(){</span>
+<span class="fc" id="L24">        this.csv = &quot;src/main/resources/History.csv&quot;;</span>
+<span class="fc" id="L25">        this.br = null;</span>
+<span class="fc" id="L26">        this.line = &quot;&quot;;</span>
+<span class="fc" id="L27">        this.csvSplit = &quot;,&quot;;</span>
+<span class="fc" id="L28">        this.scanner = new Scanner(System.in);</span>
+<span class="fc" id="L29">        this.CatalogMap = new HashMap&lt;String, String[]&gt;();</span>
+<span class="fc" id="L30">        this.date = &quot;&quot;;</span>
+<span class="fc" id="L31">        this.ApproachStart = false;</span>
+<span class="fc" id="L32">        this.RateCalList = new ArrayList&lt;Double&gt;();</span>
+<span class="fc" id="L33">        this.eL = &quot;^(^(\\d{4}|\\d{2})(\\-|\\/|\\.)\\d{1,2}\\3\\d{1,2}$)|(^\\d{4}Y\\d{1,2}M\\d{1,2}D$)$ &quot;;</span>
+<span class="fc" id="L34">    }</span>
+
+
+    @Override
+    public double[] doOperation(String start_date, String currency1, String currency2, String end_date) {
+
+
+        try{
+<span class="fc" id="L42">            br = new BufferedReader(new FileReader(csv));//</span>
+
+
+            /*
+            读取文件部分，主要又三个if判断句组成，判断是否开始，是否在选定日期之间，是否结束
+             */
+<span class="fc bfc" id="L48" title="All 2 branches covered.">            while((line = br.readLine()) != null){//</span>
+
+<span class="fc" id="L50">                message = line.split(csvSplit,2);//</span>
+<span class="fc" id="L51">                Pattern p = Pattern.compile(eL);</span>
+<span class="fc" id="L52">                Matcher m = p.matcher(message[0]);</span>
+<span class="fc" id="L53">                boolean b = m.matches();</span>
+
+<span class="fc bfc" id="L55" title="All 2 branches covered.">                if(b){</span>
+<span class="fc" id="L56">                    date = message[0];//</span>
+<span class="fc" id="L57">                    CatalogMap.put(message[0],message[1].split(csvSplit));//</span>
+                }
+
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">                if(message[0].equals(end_date)){//</span>
+<span class="nc" id="L61">                    ApproachStart = false;//</span>
+<span class="nc" id="L62">                    ReadOneDate(currency1,currency2);//</span>
+<span class="nc" id="L63">                    break;</span>
+                }
+
+<span class="fc bfc" id="L66" title="All 2 branches covered.">                if(message[0].equals(start_date)){//</span>
+<span class="fc" id="L67">                    ApproachStart = true;</span>
+<span class="fc" id="L68">                    ReadOneDate(currency1,currency2);</span>
+                }
+
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">                if(ApproachStart){//</span>
+<span class="fc" id="L72">                    ReadOneDate(currency1,currency2);</span>
+                }
+
+<span class="fc" id="L75">            }</span>
+            /*
+            计算数值同时打印
+             */
+<span class="fc" id="L79">            System.out.println(this.RateCalList);</span>
+<span class="fc" id="L80">            double ave = calculateAVE();</span>
+<span class="fc" id="L81">            double min = min();</span>
+<span class="fc" id="L82">            double max = max();</span>
+<span class="fc" id="L83">            double median = median();</span>
+<span class="fc" id="L84">            double sd = sd();</span>
+<span class="fc" id="L85">            double[] list ={ave,min,max,median,sd};</span>
+<span class="fc" id="L86">            System.out.println(&quot;average: &quot;+ave+&quot; minimum: &quot;+min+&quot; maximum: &quot;+max+&quot; median: &quot;+median+&quot; standard deviation: &quot;+sd+&quot;.&quot;);</span>
+<span class="fc" id="L87">            return list;</span>
+
+<span class="fc" id="L89">        } catch(IOException | NullPointerException e){</span>
+<span class="fc" id="L90">            System.out.println(&quot;File Read Error&quot;);</span>
+<span class="fc" id="L91">            return null;</span>
+        }
+    }
+
+    /*
+    ReadOneDate的作用就是为了，在指针定位到一个日期后，在这个日期表格内找到需要的两个货币之间的汇率
+     */
+
+    private void ReadOneDate(String currency1, String currency2) throws IOException {
+<span class="fc" id="L100">        int i = 0;</span>
+
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        if(message[0].equals(currency1)){//\</span>
+<span class="fc" id="L103">            String[] RateList = message[1].split(csvSplit);//\</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">            for(String x: CatalogMap.get(date)){//\</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">                if(x.equals(currency2)){//\</span>
+<span class="fc" id="L106">                    break;</span>
+                }
+<span class="fc" id="L108">                i++;</span>
+            }
+<span class="fc" id="L110">            System.out.println(date +&quot;-&gt;&quot;+ currency1+&quot;-&gt;&quot;+currency2+&quot;: &quot;+ RateList[i]);</span>
+<span class="fc" id="L111">            RateCalList.add(Double.parseDouble(RateList[i]));//</span>
+        }
+
+<span class="fc" id="L114">    }</span>
+
+    private double calculateAVE(){
+<span class="fc" id="L117">        double sum = 0;</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        for(double x: RateCalList){</span>
+<span class="fc" id="L119">            sum+=x;</span>
+<span class="fc" id="L120">        }</span>
+<span class="fc" id="L121">        double ave = sum/RateCalList.size();</span>
+<span class="fc" id="L122">        return ave;</span>
+    }
+
+    private double min(){
+<span class="fc" id="L126">        return Collections.min(RateCalList);</span>
+    }
+
+    private double max(){
+<span class="fc" id="L130">        return Collections.max(RateCalList);</span>
+    }
+
+    private double median() {
+<span class="fc" id="L134">        double s = 0;</span>
+<span class="fc" id="L135">        Collections.sort(RateCalList);</span>
+<span class="fc" id="L136">        int size = RateCalList.size();</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        if (size % 2 != 1) {</span>
+<span class="fc" id="L138">            s = (RateCalList.get(size / 2 - 1) + RateCalList.get(size / 2)) / 2;</span>
+
+        } else {
+<span class="fc" id="L141">            s = RateCalList.get((size - 1) / 2);</span>
+        }
+<span class="fc" id="L143">        return s;</span>
+    }
+
+    private double sd(){
+<span class="fc" id="L147">        double dsum=0;</span>
+<span class="fc" id="L148">        double average = calculateAVE();</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        for(int i = 0; i &lt; RateCalList.size(); ++i)</span>
+        {
+<span class="fc" id="L151">            double s= RateCalList.get(i) - average;</span>
+<span class="fc" id="L152">            dsum  += Math.pow(s,2);</span>
+        }
+<span class="fc" id="L154">        double dStdDev =  Math.sqrt(dsum / RateCalList.size());</span>
+<span class="fc" id="L155">        return dStdDev;</span>
+    }
+
+
+    public void SetCSV(String s) {
+<span class="fc" id="L160">        this.csv = s;</span>
+<span class="fc" id="L161">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

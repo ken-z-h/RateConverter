@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ConverterTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2022-09-19T11:12:07" hostname="vlan-2662-10-19-250-126.student.wireless.sydney.edu.au" time="0.022">
+  <properties/>
+  <testcase name="ConventerTest1()" classname="ConverterTest" time="0.021"/>
+  <testcase name="ConventerTest2()" classname="ConverterTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

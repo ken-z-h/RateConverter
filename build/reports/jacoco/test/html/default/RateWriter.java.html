@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RateWriter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assg1</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">RateWriter.java</span></div><h1>RateWriter.java</h1><pre class="source lang-java linenums">import java.io.*;
+import java.security.Key;
+import java.util.*;
+
+import javax.sound.sampled.Line;
+<span class="fc" id="L6">public class RateWriter {</span>
+    private HashMap&lt;String, ArrayList&lt;String&gt;&gt; newRate;
+    private ArrayList&lt;String&gt; CurrencyList;
+    private int Keysize;
+<span class="fc" id="L10">    private String path = &quot;src/main/resources/InitialExchangeRate.csv&quot;;</span>
+<span class="fc" id="L11">    private String History = &quot;src/main/resources/History.csv&quot;;</span>
+
+    public void rateWriter() throws Exception{
+        try{
+<span class="fc" id="L15">            ArrayList&lt;String[]&gt; List = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L16">            BufferedReader textFile = new BufferedReader(new FileReader(path));</span>
+<span class="fc" id="L17">            FileOutputStream historyFileWriter = new FileOutputStream(History, true);</span>
+<span class="fc" id="L18">            String LineData = &quot;&quot;;</span>
+<span class="fc" id="L19">            Integer Linnum = 0;</span>
+<span class="fc bfc" id="L20" title="All 2 branches covered.">            while ((LineData = textFile.readLine())!=null){</span>
+<span class="fc" id="L21">                List.add(LineData.split(&quot;,&quot;));</span>
+<span class="fc" id="L22">                historyFileWriter.write(LineData.getBytes());</span>
+<span class="fc" id="L23">                historyFileWriter.write(&quot;\n&quot;.getBytes());</span>
+<span class="fc" id="L24">                Linnum += 1;</span>
+            }
+<span class="fc" id="L26">            historyFileWriter.flush();</span>
+<span class="fc" id="L27">            textFile.close();</span>
+<span class="fc" id="L28">            historyFileWriter.close();</span>
+<span class="fc" id="L29">            File writeFile = new File(path);</span>
+<span class="fc" id="L30">            BufferedWriter writeText = new BufferedWriter(new FileWriter(writeFile));</span>
+<span class="fc" id="L31">            this.Keysize = this.CurrencyList.size();</span>
+            // System.out.println(Keysize);
+<span class="fc bfc" id="L33" title="All 2 branches covered.">            for(int i = 0; i &lt;= Keysize-1; i++){</span>
+                // System.out.println(this.CurrencyList.get(i));
+<span class="fc bfc" id="L35" title="All 2 branches covered.">                if (i != Keysize-1){</span>
+<span class="fc" id="L36">                    writeText.write(this.CurrencyList.get(i) + &quot;,&quot;);</span>
+                }else{
+<span class="fc" id="L38">                    writeText.write(this.CurrencyList.get(i));</span>
+                }
+<span class="fc" id="L40">                writeText.flush();</span>
+            }
+<span class="fc" id="L42">            writeText.newLine();</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">            for(int i = 1; i &lt; this.Keysize; i++){</span>
+<span class="fc" id="L44">                String key = this.CurrencyList.get(i);</span>
+<span class="fc" id="L45">                writeText.write(key + &quot;,&quot;);</span>
+                // System.out.println(i);
+<span class="fc bfc" id="L47" title="All 2 branches covered.">                for (int x = 0; x &lt; this.Keysize-1; x++){</span>
+<span class="fc" id="L48">                    ArrayList&lt;String&gt; value = this.newRate.get(key);</span>
+                    // System.out.println(value.get(x));
+<span class="fc bfc" id="L50" title="All 2 branches covered.">                    if (x != this.Keysize-2){</span>
+<span class="fc" id="L51">                        writeText.write(value.get(x) + &quot;,&quot;);</span>
+                    }
+                    else{
+<span class="fc" id="L54">                        writeText.write(value.get(x));</span>
+                    }
+<span class="fc" id="L56">                    writeText.flush();</span>
+                }
+<span class="fc" id="L58">                writeText.newLine();</span>
+<span class="fc" id="L59">                writeText.flush();</span>
+            }
+            // writeText.write(&quot;;&quot;);
+<span class="fc" id="L62">            writeText.flush();</span>
+<span class="fc" id="L63">            writeText.close();</span>
+<span class="fc" id="L64">        }catch(IOException | NullPointerException e){</span>
+<span class="fc" id="L65">            System.out.println(&quot;File write Error&quot;);</span>
+<span class="fc" id="L66">        }</span>
+<span class="fc" id="L67">    }</span>
+
+    public int rateEditer(String Currency, ArrayList&lt;String&gt;editRateList, String date){
+        // System.out.println(Currency);
+<span class="fc" id="L71">        ArrayList&lt;String&gt; target = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L72">        target.add(Currency);</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        for(int y = 1; y &lt; editRateList.size()+1; y++){</span>
+<span class="fc" id="L74">            target.add(editRateList.get(y-1));</span>
+        }
+<span class="fc" id="L76">        ArrayList&lt;String[]&gt; List = new ArrayList&lt;&gt;();</span>
+        try{
+<span class="fc" id="L78">            BufferedReader textFile = new BufferedReader(new FileReader(path));</span>
+<span class="fc" id="L79">            FileOutputStream historyFileWriter = new FileOutputStream(History);</span>
+<span class="fc" id="L80">            String LineData = &quot;&quot;;</span>
+<span class="fc" id="L81">            Integer Linnum = 1;</span>
+<span class="fc" id="L82">            Integer targetNum = -1;</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            while ((LineData = textFile.readLine())!=null){</span>
+<span class="fc" id="L84">                List.add(LineData.split(&quot;,&quot;));</span>
+<span class="fc" id="L85">                historyFileWriter.write(LineData.getBytes());</span>
+<span class="fc" id="L86">                historyFileWriter.write(&quot;\n&quot;.getBytes());</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">                if(LineData.startsWith(Currency)){</span>
+<span class="fc" id="L88">                    targetNum = Linnum;</span>
+                }
+<span class="fc" id="L90">                historyFileWriter.flush();</span>
+<span class="fc" id="L91">                Linnum += 1;</span>
+            }
+<span class="fc" id="L93">            textFile.close();</span>
+<span class="fc" id="L94">            historyFileWriter.close();</span>
+            // System.out.println(&quot;targetNum: &quot;+targetNum);
+<span class="fc" id="L96">            BufferedWriter textFileWriter = new BufferedWriter(new FileWriter(path));</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">            for (int i = 0; i &lt; List.size(); i++){</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">                if (i == 0){</span>
+<span class="fc" id="L99">                    textFileWriter.write(date + &quot;,&quot;);</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">                    for (int x = 1; x &lt; List.get(i).length; x++){</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">                        if (x != List.get(i).length -1){</span>
+<span class="fc" id="L102">                            textFileWriter.write(List.get(i)[x] + &quot;,&quot;);</span>
+                        }
+                        else{
+<span class="fc" id="L105">                            textFileWriter.write(List.get(i)[x]);</span>
+<span class="fc" id="L106">                            textFileWriter.newLine();</span>
+                        }
+                    }
+<span class="fc" id="L109">                    i++;</span>
+                }
+<span class="fc bfc" id="L111" title="All 2 branches covered.">                if (i == targetNum){</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">                    for(int x = 0; x &lt; target.size(); x++){</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">                        if (x != target.size()-1){</span>
+<span class="fc" id="L114">                            textFileWriter.write(target.get(x) + &quot;,&quot;);</span>
+                        }
+                        else{
+<span class="fc" id="L117">                            textFileWriter.write(target.get(x));</span>
+<span class="fc" id="L118">                            textFileWriter.newLine();</span>
+                        }
+                    }
+                }
+                else{
+<span class="fc bfc" id="L123" title="All 2 branches covered.">                    for (int x = 0; x &lt; List.get(i).length; x++){</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">                        if (x == targetNum){</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">                            if (x != List.get(i).length -1){</span>
+                                // System.out.println(editRateList.get(i-1));
+<span class="fc" id="L127">                                textFileWriter.write(String.format(&quot;%.2f&quot;, (1/Double.parseDouble(editRateList.get(i-1)))) + &quot;,&quot;);</span>
+                            }
+                            else{
+                                // System.out.println(editRateList.get(i-1) + i);
+<span class="nc" id="L131">                                textFileWriter.write(String.format(&quot;%.2f&quot;, (1/Double.parseDouble(editRateList.get(i-1)))));</span>
+<span class="nc" id="L132">                                textFileWriter.newLine();</span>
+                            }
+                        }
+                        else{
+<span class="fc bfc" id="L136" title="All 2 branches covered.">                            if (x != List.get(i).length -1){</span>
+<span class="fc" id="L137">                                textFileWriter.write(List.get(i)[x] + &quot;,&quot;);</span>
+                            }
+                            else{
+<span class="fc" id="L140">                                textFileWriter.write(List.get(i)[x]);</span>
+<span class="fc" id="L141">                                textFileWriter.newLine();</span>
+                            }
+                        }
+                    }
+                }
+<span class="fc" id="L146">                textFileWriter.flush();</span>
+            }
+            // if (isNew){
+            //     textFileWriter.write(Currency + &quot;,&quot;);
+            //     for (int z = 0; z &lt; editRateList.size(); z++){
+            //         if (z != editRateList.size()-1){
+            //             textFileWriter.write(editRateList.get(z) + &quot;,&quot;);
+            //         }else{
+            //             textFileWriter.write(editRateList.get(z));
+            //         }
+
+            //     }
+            // }
+<span class="fc" id="L159">            textFileWriter.flush();</span>
+<span class="fc" id="L160">            textFileWriter.close();</span>
+<span class="fc" id="L161">        }catch(IOException | NullPointerException e){</span>
+<span class="fc" id="L162">            System.out.println(&quot;File Read Error&quot;);</span>
+<span class="fc" id="L163">        }</span>
+<span class="fc" id="L164">        return 0;</span>
+
+    }
+
+
+    public void setRateCurc(HashMap&lt;String, ArrayList&lt;String&gt;&gt; newRates){
+<span class="fc" id="L170">        this.newRate = newRates;</span>
+<span class="fc" id="L171">    }</span>
+    public void setCurcList(ArrayList&lt;String&gt; newCurrencies){
+<span class="fc" id="L173">        this.CurrencyList = newCurrencies;</span>
+<span class="fc" id="L174">    }</span>
+
+    public void setpath(String s) {
+<span class="fc" id="L177">        this.path = s;</span>
+<span class="fc" id="L178">    }</span>
+
+    public void setHistory_write_path(String s) {
+<span class="fc" id="L181">    this.History = s;</span>
+<span class="fc" id="L182">    }</span>
+    // public void setEditRateList(ArrayList&lt;String&gt; ChangedRate){
+    //     this.editRateList = ChangedRate;
+    // }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="RateHistoryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2022-09-19T11:12:07" hostname="vlan-2662-10-19-250-126.student.wireless.sydney.edu.au" time="0.016">
+  <properties/>
+  <testcase name="RateHistoryScenario1()" classname="RateHistoryTest" time="0.012"/>
+  <testcase name="RateHistoryScenario2()" classname="RateHistoryTest" time="0.001"/>
+  <testcase name="RateHistoryScenario3()" classname="RateHistoryTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
